@@ -1,0 +1,14 @@
+[project]
+name = "exercism-python-exercises"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "mypy>=1.16.1",
+    "pytest>=8.4.1",
+    "pytest-cache>=1.0",
+    "pytest-subtests>=0.14.2",
+    "ruff>=0.12.2",
+]
