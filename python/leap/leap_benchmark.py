@@ -1,4 +1,7 @@
-from leap import if4
+from lib import if4
+import leap
+
+leap.leap_year(5)
 
 
 def test_leap_100_years(benchmark):
