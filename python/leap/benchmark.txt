@@ -1,0 +1,73 @@
+--- starting benchmark script ---
+============================= test session starts ==============================
+platform linux -- Python 3.10.18, pytest-8.4.1, pluggy-1.6.0
+benchmark: 5.1.0 (defaults: timer=time.perf_counter disable_gc=False min_rounds=5 min_time=0.000005 max_time=1.0 calibration_precision=10 warmup=False warmup_iterations=100000)
+rootdir: /mnt/containers/stlei/I/proj/org/exercism/python
+configfile: pytest.ini
+plugins: subtests-0.14.2, benchmark-5.1.0
+collected 7 items
+
+benchmark.py ......F                                                     [100%]
+
+=================================== FAILURES ===================================
+_________________________ test_leap_2k_years[datetime] _________________________
+
+solution = <module 'solutions.datetime' from '/mnt/containers/stlei/I/proj/org/exercism/python/leap/solutions/datetime.py'>
+benchmark = <pytest_benchmark.fixture.BenchmarkFixture object at 0x707353610490>
+
+    @pytest.mark.benchmark(
+        group="leap-2k-years",
+        # min_time=0.1,  # noqa: ERA001
+        max_time=0.5,
+        min_rounds=1,
+        # timer=time.time,  # noqa: ERA001
+        # disable_gc=True,  # noqa: ERA001
+        # warmup=False  # noqa: ERA001
+    )
+    def test_leap_2k_years(solution, benchmark):
+        def leap_2k_years():
+            for year in range(2200):
+                solution.leap_year(year)
+    
+>       benchmark(leap_2k_years)
+
+benchmark.py:25: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../.venv/lib/python3.10/site-packages/pytest_benchmark/fixture.py:156: in __call__
+    return self._raw(function_to_benchmark, *args, **kwargs)
+../.venv/lib/python3.10/site-packages/pytest_benchmark/fixture.py:180: in _raw
+    duration, iterations, loops_range = self._calibrate_timer(runner)
+../.venv/lib/python3.10/site-packages/pytest_benchmark/fixture.py:318: in _calibrate_timer
+    duration = runner(loops_range)
+../.venv/lib/python3.10/site-packages/pytest_benchmark/fixture.py:109: in runner
+    function_to_benchmark(*args, **kwargs)
+benchmark.py:23: in leap_2k_years
+    solution.leap_year(year)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+year = 0
+
+    def leap_year(year):
+>       return (date(year, 2, 28) + timedelta(days=1)).day == 29
+E       ValueError: year 0 is out of range
+
+solutions/datetime.py:11: ValueError
+
+-------------------------------------------------------------------------------------- benchmark 'leap-2k-years': 6 tests -------------------------------------------------------------------------------------
+Name (time in us)                       Median               IQR                Mean             StdDev                 Min                 Max            Outliers  OPS (Kops/s)            Rounds  Iterations
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+test_leap_2k_years[stdlib]            235.5530 (1.0)      2.7653 (1.03)     242.0061 (1.0)      22.4121 (1.10)     234.2840 (1.0)      453.3920 (1.03)      160;203        4.1321 (1.0)        2077           1
+test_leap_2k_years[boolean]           238.4110 (1.01)     5.5420 (2.06)     244.8794 (1.01)     22.7263 (1.12)     235.5420 (1.01)     467.1070 (1.06)      169;205        4.0836 (0.99)       2100           1
+test_leap_2k_years[if4]               241.7190 (1.03)     2.8105 (1.05)     247.3355 (1.02)     20.3095 (1.0)      239.9650 (1.02)     438.8530 (1.0)       162;189        4.0431 (0.98)       2049           1
+test_leap_2k_years[ternary_falsy]     243.7370 (1.03)     2.6875 (1.0)      249.7132 (1.03)     21.2467 (1.05)     242.5690 (1.04)     454.9290 (1.04)      152;173        4.0046 (0.97)       2025           1
+test_leap_2k_years[if100]             273.0960 (1.16)     2.7805 (1.03)     278.7894 (1.15)     21.4493 (1.06)     271.5210 (1.16)     488.2610 (1.11)      134;159        3.5869 (0.87)       1768           1
+test_leap_2k_years[ternary]           272.9400 (1.16)     2.9710 (1.11)     279.1003 (1.15)     21.7932 (1.07)     270.9170 (1.16)     473.9690 (1.08)      144;177        3.5829 (0.87)       1810           1
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Legend:
+  Outliers: 1 Standard Deviation from Mean; 1.5 IQR (InterQuartile Range) from 1st Quartile and 3rd Quartile.
+  OPS: Operations Per Second, computed as 1 / Mean
+=========================== short test summary info ============================
+FAILED benchmark.py::test_leap_2k_years[datetime] - ValueError: year 0 is out...
+========================= 1 failed, 6 passed in 4.12s ==========================
+--- benchmark script finished ---

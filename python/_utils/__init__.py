@@ -1,0 +1,102 @@
+"""(Exercise) Solutions
+
+The `solutions` package is meant to serve as a container for different
+solutions for an Exercism exercise.
+The code in this file is meant to provide utilities for conveniently
+accessing the solutions instead of the top level solution file which
+should function as an annotation/documentation stub and a wrapper around
+the currently worked on solution for the exercism test file.
+"""
+
+from importlib import import_module
+from pathlib import Path
+from types import ModuleType
+
+_solution_modules: tuple[ModuleType, ...] | None = None
+
+
+class SolutionsNotFoundError(Exception):
+    def __init__(self, solutions_dir: Path | str):
+        super().__init__(f"No solutions found in: {solutions_dir}")
+
+
+class LatestSolutionNotFoundError(Exception):
+    def __init__(self):
+        super().__init__("Could not find the latest solution.")
+
+
+def _get_solution_paths(root_path: str) -> tuple[Path, ...]:
+    basedir = Path(root_path).parent / "solutions"
+    paths = tuple(
+        path
+        for path in basedir.glob("[!_]*")
+        if (path.is_file() and path.suffix == ".py")
+        or (path.is_dir() and path.joinpath("__init__.py").exists())
+    )
+
+    if len(paths) == 0:
+        raise SolutionsNotFoundError(basedir)
+
+    return paths
+
+
+def _module_from_path(path: Path) -> ModuleType:
+    return import_module(f"{__name__}.{path.stem}")
+
+
+def _get_latest_solution_path(root_path: str) -> Path:
+    latest_mtime: float = 0
+    latest_path: Path | None = None
+
+    for path in _get_solution_paths(root_path):
+        if latest_path is None:
+            latest_path = path
+            latest_mtime = path.stat().st_mtime
+        elif (
+            path.is_file() and (mtime := path.stat().st_mtime) > latest_mtime
+        ):
+            latest_path = path
+            latest_mtime = mtime
+        else:
+            for filepath in path.glob("**/*"):
+                if (mtime := filepath.stat().st_mtime) > latest_mtime:
+                    latest_path = path
+                    latest_mtime = mtime
+
+    if latest_path is None:
+        raise LatestSolutionNotFoundError
+
+    return latest_path
+
+
+def get_solution_modules(root_path: str) -> tuple[ModuleType, ...]:
+    """Get list of all solution modules.
+
+    The modules are loaded in the process.
+    This is meant mostly for benchmarking.
+    """
+    global _solution_modules  # noqa: PLW0603
+    if _solution_modules is None:
+        _solution_modules = tuple(
+            _module_from_path(path) for path in _get_solution_paths(root_path)
+        )
+    return _solution_modules
+
+
+def importall_from_latest(root_name: str, root_path: str):
+    """Import all names from the most recently modified solution.
+
+    Import all public names from the most recently modified solution
+    in the `solutions` package into the namespace of the module
+    specified by `module_name`.
+    This is meant to be called by the top level solution file to provide
+    a convenient way to manually/automatically test the currently worked
+    on solution without modifying the test code.
+    """
+    solution_module = _module_from_path(_get_latest_solution_path(root_path))
+    names = (
+        name for name in solution_module.__dict__ if not name.startswith("_")
+    )
+    module = import_module(root_name)
+    for name in names:
+        setattr(module, name, getattr(solution_module, name))

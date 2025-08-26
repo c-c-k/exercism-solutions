@@ -1,0 +1,8 @@
+# [rules]
+# call-non-callable = "ignore"
+
+# [environment]
+# root = ["./leap"]
+
+# [src]
+# exclude = ["./leap/*"]

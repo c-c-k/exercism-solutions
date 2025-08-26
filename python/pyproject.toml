@@ -13,3 +13,6 @@ dev = [
     "pytest-subtests>=0.14.2",
     "ruff>=0.12.2",
 ]
+
+# [tools.ty.rules]
+# call-non-callable = "ignore"
