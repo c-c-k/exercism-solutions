@@ -1,0 +1,202 @@
+// NOTE:Boyer-Moore Algorithm
+// <https://en.wikipedia.org/wiki/Boyer%E2%80%93Moore_string-search_algorithm>
+// <https://www.geeksforgeeks.org/boyer-moore-algorithm-for-pattern-searching/>
+// <https://www.geeksforgeeks.org/boyer-moore-algorithm-good-suffix-heuristic/>
+// **The following site seems to be AI generated content**
+// <https://www.codingdrills.com/tutorial/introduction-to-searching-algorithms/sublist-search-python>
+
+use std::{collections::HashMap, fmt::Debug, hash::Hash};
+
+fn _build_bad_char_table<T>(sub_list: &[T]) -> HashMap<&T, usize>
+where
+    T: PartialEq + Eq + Hash,
+{
+    // let bad_char_table = HashMap::from_iter;
+    // let bad_char_table: HashMap<&T, usize> =
+    //     HashMap::from_iter(sub_list.iter().enumerate().map(|(i, v)| (v, i)));
+    // // let y: HashMap<&u8, usize> = HashMap::from_iter(x.iter().enumerate().map(|(i, v)| (v, i)));
+    // let mut bad_char_table = HashMap::with_capacity(sub_list.len());
+    // for i in 0..sub_list.len() - 1 {
+    //     // bad_char_table.insert(&sub_list[i], sub_list.len() - 1 - i);
+    //     bad_char_table.insert(&sub_list[i], i);
+    // }
+    // bad_char_table
+    HashMap::from_iter(sub_list.iter().enumerate().map(|(i, v)| (v, i)))
+}
+
+fn _preprocess_general_case<T>(
+    good_suffix_table: &mut [usize],
+    borders: &mut [usize],
+    sub_list: &[T],
+) where
+    T: PartialEq + Eq,
+{
+    // let mut posiotion = sub_list.len() - 1;
+    let mut posiotion = sub_list.len();
+    // let mut border = sub_list.len();
+    let mut border = sub_list.len() + 1;
+    borders[posiotion] = border;
+
+    while posiotion > 0 {
+        // while border <= sub_list.len() && sub_list[posiotion - 1] != sub_list[border - 1] {
+        while border <= sub_list.len() && sub_list[posiotion - 1] != sub_list[border - 1] {
+            if good_suffix_table[border] == 0 {
+                good_suffix_table[border] = border - posiotion;
+            };
+
+            border = borders[border]
+        }
+
+        posiotion -= 1;
+        border -= 1;
+        borders[posiotion] = border;
+    }
+}
+
+fn _preprocess_fallback_case<T>(
+    good_suffix_table: &mut [usize],
+    borders: &mut [usize],
+    sub_list: &[T],
+) where
+    T: PartialEq + Eq,
+{
+    let mut border = borders[0];
+
+    // good_suffix_table.iter_mut().enumerate().take(sub_list.len()+1);
+
+    // for position in 0..=sub_list.len() {
+    // for position in 0..=sub_list.len() {
+    // .take(sub_list.len() + 1)
+    for (position, gst_entry) in good_suffix_table.iter_mut().enumerate().take(borders.len()) {
+        // if good_suffix_table[position] == 0 {
+        //     good_suffix_table[position] = border;
+        if *gst_entry == 0 {
+            *gst_entry = border;
+        };
+
+        if position == border {
+            border = borders[border]
+        };
+    }
+}
+
+fn _build_good_suffix_table<T>(sub_list: &[T]) -> Vec<usize>
+where
+    T: PartialEq + Eq,
+{
+    let mut borders: Vec<usize> = vec![0; sub_list.len() + 1];
+    let mut good_suffix_table: Vec<usize> = vec![0; sub_list.len() + 1];
+
+    _preprocess_general_case(&mut good_suffix_table, &mut borders, sub_list);
+    _preprocess_fallback_case(&mut good_suffix_table, &mut borders, sub_list);
+
+    good_suffix_table
+}
+
+pub fn find_sublists<T>(super_list: &[T], sub_list: &[T]) -> (bool, Vec<usize>)
+where
+    T: PartialEq + Eq + Hash + Debug,
+{
+    if sub_list.is_empty() {
+        return (true, vec![0]);
+    }
+    if sub_list.len() > super_list.len() {
+        return (false, vec![]);
+    }
+
+    let mut match_positions: Vec<usize> = Vec::new();
+
+    let bad_char_table = _build_bad_char_table(sub_list);
+    let good_suffix_table = _build_good_suffix_table(sub_list);
+
+    // println!("good suf: {:?}", &good_suffix_table);
+    let mut match_end = sub_list.len() - 1;
+    let mut bad_char_skip: usize;
+    let mut good_suffix_skip: usize;
+    // let mut __iter = 0;
+
+    while match_end < super_list.len() {
+        // __iter += 1;
+        // if __iter > super_list.len() {
+        //     println!("{}", sub_list.len() - super_list.len() - 100);
+        // } else {
+        //     continue;
+        // }
+        // let match_start = match_end.saturating_sub(sub_list.len());
+        // let match_start = match_end as i64 - sub_list.len() as i64 + 1;
+        // let pad = if match_start > 0 { match_start + 1 } else { 0 };
+        // let pad = "  ".repeat(pad as usize);
+
+        // println!("{super_list:?}");
+        // println!(
+        //     "{}{:?}(off:{})",
+        //     // "  ".repeat(match_start as usize),
+        //     pad,
+        //     sub_list,
+        //     match_start
+        // );
+        // let mut sublist_index = sub_list.len() + 1;
+        // let mut list_index = match_end + 1;
+        let mut sub_list_index = sub_list.len() - 1;
+        let mut super_list_index = match_end;
+        // let mut found_match = true;
+        // while sublist_index >= 0 && super_list[list_index] == sub_list[sublist_index] {
+        // while super_list[list_index] == sub_list[sublist_index] {
+        // loop {
+        // let found_match = for _ in 0..sub_list.len() {
+        let found_match = loop {
+            // if super_list[list_index] == sub_list[sublist_index] {
+            if super_list[super_list_index] != sub_list[sub_list_index] {
+                break false;
+            }
+            if sub_list_index == 0 {
+                break true;
+            }
+            super_list_index -= 1;
+            sub_list_index -= 1;
+        };
+
+        // if sublist_index < 0 {
+        // if sublist_index == 0 {
+        if found_match {
+            // println!("found");
+            // match_positions.push(list_index + 1);
+            match_positions.push(super_list_index);
+
+            bad_char_skip =
+                // sub_list.len() - bad_char_table.get(&super_list[match_end + 1]).unwrap_or(&0) + 1;
+                // sub_list.len() - bad_char_table.get(&super_list[match_end ]).unwrap_or(&0) + 1;
+                // bad_char_table.get(&super_list[match_end -1]).unwrap_or(sub_list.len());
+                // *bad_char_table.get(&super_list[match_end ]).unwrap_or(&(sub_list.len()+1));
+                // bad_char_table.get(&super_list[match_end]).map_or(sub_list.len()+1, |v| *v);
+                // sub_list.len() -1 - bad_char_table.get(&super_list[match_end]).map_or(sub_list.len()+1, |v| *v);
+                sub_list.len() - bad_char_table.get(&super_list[match_end]).map_or(sub_list.len(), |v| *v);
+            good_suffix_skip = good_suffix_table[0];
+        } else {
+            // println!("not match");
+            // MEMO: Compensation for the possibility of bad_char_skip resolving to
+            // a negative shift is done later when selecting between
+            // bad_char_skip and good_suffix_skip
+            // (which would always be a positive shift)
+            // bad_char_skip = bad_char_table.get(&super_list[super_list_index]).map_or(sub_list.len()+1, |v| *v);
+            bad_char_skip = sub_list_index.saturating_sub(
+                bad_char_table
+                    .get(&super_list[super_list_index])
+                    .map_or(sub_list.len(), |v| *v),
+            );
+            // bad_char_skip = sub_list.len()
+            //     - bad_char_table
+            //         .get(&super_list[super_list_index])
+            //         .unwrap_or(&0);
+            // good_suffix_skip = good_suffix_table[sublist_index + 1];
+            good_suffix_skip = good_suffix_table[sub_list_index + 1];
+        }
+
+        match_end += bad_char_skip.max(good_suffix_skip);
+        // match_end += bad_char_skip.max(1);
+        // match_end += good_suffix_skip - 1;
+        // match_end += good_suffix_skip;
+    }
+
+    (!match_positions.is_empty(), match_positions)
+}

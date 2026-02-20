@@ -1,0 +1,45 @@
+{
+  "authors": [
+    "EduardoBautista"
+  ],
+  "contributors": [
+    "ashleygwilliams",
+    "coriolinus",
+    "cwhakes",
+    "eddyp",
+    "EduardoBautista",
+    "efx",
+    "ErikSchierboom",
+    "IanWhitney",
+    "kytrinyx",
+    "lutostag",
+    "mkantor",
+    "nfiles",
+    "petertseng",
+    "rofrol",
+    "stringparser",
+    "xakon",
+    "ZapAnton"
+  ],
+  "files": {
+    "solution": [
+      "src/adeveloper385.rs",
+      "src/bobahop.rs",
+      "src/boyer_moore.rs",
+      "src/iago_lito.rs",
+      "src/kmp.rs",
+      "src/lib.rs",
+      "src/linear.rs",
+      "src/main.rs",
+      "src/vagrawal.rs",
+      "Cargo.toml"
+    ],
+    "test": [
+      "tests/sublist.rs"
+    ],
+    "example": [
+      ".meta/example.rs"
+    ]
+  },
+  "blurb": "Write a function to determine if a list is a sublist of another list."
+}
