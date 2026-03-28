@@ -9,4 +9,4 @@ edition = "2024"
 [dependencies]
 
 [dev-dependencies]
-pretty_assertions = "*"
+pretty_assertions.workspace = true
